@@ -1,19 +1,34 @@
-import React, { useState} from 'react';
+import React, { useState, useEffect} from 'react';
 import Todo from './Todo';
 import { Button, FormControl, Input, InputLabel } from '@material-ui/core';
 import './App.css';
+import db from './firebase';
 
 function App() {
-  const [todos, setTodos] = useState(['Take dogs for a walk', 'Take the rubbish out', 'You can add one by one']);
+  const [todos, setTodos] = useState(['abc', 'def']);
   const [input, setInput] = useState('');
-  console.log('🌟', input);
+  // console.log('🌟', input);
+
+  // when the app loads, we need to listen to the database and ftech new todo as they added/removed
+  useEffect(() => {
+    // this code here... fires when the app.js loads
+    db.collection('todos').onSnapshot(snapshot => {
+      // console.log(snapshot.docs.map(doc => doc.data()));
+      setTodos(snapshot.docs.map(doc => doc.data().todo))
+    })
+  }, []);
 
   const addTodo = (event) => {
     // this will fire off when we click the button
     event.preventDefault();
     // this will stop the REFRESH
-    console.log('🚀', 'Im working !!!');
-    setTodos([...todos, input]);
+    // console.log('🚀', 'Im working !!!');
+    
+    db.collection('todos').add({
+      todo: input
+    })
+    
+    // setTodos([...todos, input]);
     setInput(''); // clear up the input after clicking add todo button
     console.log(todos);
   }
